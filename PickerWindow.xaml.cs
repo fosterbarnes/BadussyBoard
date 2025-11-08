@@ -22,17 +22,37 @@ namespace BadussyBoard
         private string? selectedFilePath;
         private string? selectedHotkey;
         private bool isCapturingHotkey = false;
-         private HashSet<Key> pressedKeys = new HashSet<Key>();
-        
-        public PickerWindow(MainWindow mainWindow)
+        private HashSet<Key> pressedKeys = new HashSet<Key>();
+        private SoundItem? _soundToEdit;
+
+        public PickerWindow(MainWindow mainWindow) : this(mainWindow, null) { } //this is here so calling "new PickerWindow(this)" still works
+
+        public PickerWindow(MainWindow mainWindow, SoundItem? soundToEdit) //main constructor
         {
             InitializeComponent();
             _mainWindow = mainWindow;
+
+            if (soundToEdit != null)
+            {
+                _soundToEdit = soundToEdit;
+                PopulateFieldsFromItem(soundToEdit);
+            }
+        }
+        
+        private void PopulateFieldsFromItem(SoundItem item)
+        {
+            selectedFilePath = item.FilePath;
+            selectedHotkey = item.Hotkey;
+            //TODO MIDI hotkey
+
+            SoundPickerText.Text = string.IsNullOrWhiteSpace(selectedFilePath) ? "Click to set sound file..." : selectedFilePath;
+            HotkeyPickerText.Text = string.IsNullOrWhiteSpace(selectedHotkey) ? "Click to set hotkey..." : selectedHotkey;
+            //TODO MIDI hotkey
         }
 
         private void SoundPicker_LeftClick(object sender, RoutedEventArgs e)
         {
-            Debug.WriteLine("Left Click: Sound File Picker");
+            Debug.WriteLine("[PickerWindow] Left Click: Sound File Picker");
 
             //Pick Sound File
             OpenFileDialog openFileDialog = new OpenFileDialog
@@ -50,13 +70,14 @@ namespace BadussyBoard
 
         private void SoundPicker_RightClick(object sender, RoutedEventArgs e)
         {
-            Debug.WriteLine("Right Click: Sound File Picker");
+            Debug.WriteLine("[PickerWindow] Right Click: Sound File Picker");
             selectedFilePath = null;
+            SoundPickerText.Text = "Click to set sound file...";
         }
 
         private void HotkeyPicker_LeftClick(object sender, RoutedEventArgs e)
         {
-            Debug.WriteLine("Left Click: Hotkey Picker");
+            Debug.WriteLine("[PickerWindow] Left Click: Hotkey Picker");
 
             //Pick Hotkey
             if (!isCapturingHotkey)
@@ -70,8 +91,9 @@ namespace BadussyBoard
 
         private void HotkeyPicker_RightClick(object sender, RoutedEventArgs e)
         {
-            Debug.WriteLine("Right Click: Hotkey Picker");
+            Debug.WriteLine("[PickerWindow] Right Click: Hotkey Picker");
             selectedHotkey = null;
+            HotkeyPickerText.Text = "Click to set hotkey...";
         }
 
         protected override void OnPreviewKeyDown(KeyEventArgs e)
@@ -103,27 +125,25 @@ namespace BadussyBoard
             if (Keyboard.Modifiers == ModifierKeys.None && pressedKeys.Count > 0)
             {
                 isCapturingHotkey = false;
-                Debug.WriteLine($"Hotkey set: {selectedHotkey}");
+                Debug.WriteLine($"[PickerWindow] Hotkey set: {selectedHotkey}");
             }
         }
         
         private void MIDIPicker_LeftClick(object sender, RoutedEventArgs e)
         {
-            Debug.WriteLine("Left Click: MIDI Picker");
+            Debug.WriteLine("[PickerWindow] Left Click: MIDI Picker");
             //TODO Add logic
         }
 
         private void MIDIPicker_RightClick(object sender, RoutedEventArgs e)
         {
-            Debug.WriteLine("Right Click: MIDI Picker");
+            Debug.WriteLine("[PickerWindow] Right Click: MIDI Picker");
             //TODO Add logic
         }
         
         private void Done_Click(object sender, RoutedEventArgs e)
         {
-            Debug.WriteLine("Click: Done");
-
-             Debug.WriteLine("Click: Done");
+            Debug.WriteLine("[PickerWindow] Click: Done");
 
             if (string.IsNullOrWhiteSpace(selectedFilePath))
             {
@@ -137,12 +157,27 @@ namespace BadussyBoard
                 return;
             }
 
-            // Add item to MainWindow
-            _mainWindow.SoundItems.Add(new SoundItem
+            if (_soundToEdit != null)
             {
-                SoundFile = selectedFilePath!,
-                Hotkey = selectedHotkey!
-            });
+                // update the existing item
+                _soundToEdit.FilePath = selectedFilePath!;
+                _soundToEdit.Hotkey = selectedHotkey!;
+                //TODO MIDI hotkey
+
+                //refresh the DataGrid
+                _mainWindow.SoundDataGrid.Items.Refresh();
+            }
+            else
+            {
+                // Add item to MainWindow as new sound
+                _mainWindow.SoundItems.Add(new SoundItem
+                {
+                    FilePath = selectedFilePath!,
+                    Hotkey = selectedHotkey!
+                    //TODO MIDI Hotkey
+                });
+            }
+            
 
             this.Close();
         }

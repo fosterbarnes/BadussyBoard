@@ -8,9 +8,9 @@ namespace BadussyBoard
 {
     public class SoundItem
     {
-        public required string SoundFile { get; set; }
-        public required string Hotkey { get; set; }
-
-        //TODO MIDI hotkeys
+        public required string FilePath { get; set; }
+        public string FileName => System.IO.Path.GetFileName(FilePath);
+        public string ?Hotkey { get; set; }
+        public string ?MIDIHotkey { get; set; }
     }
 }

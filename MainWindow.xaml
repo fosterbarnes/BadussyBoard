@@ -91,9 +91,10 @@
         </StackPanel>
     </Grid>
 
-
+        <!-- Data grid of existing sounds-->
         <DataGrid x:Name="SoundDataGrid" RowHeaderWidth="0" AutoGenerateColumns="False" CanUserAddRows="False" CanUserResizeRows="False" IsReadOnly="True" 
             GridLinesVisibility="None" BorderBrush="#5e5e5e" SelectionMode="Single" Grid.Row="1" Background="#282828">
+            
             <DataGrid.ColumnHeaderStyle>
                 <Style TargetType="DataGridColumnHeader">
                     <Setter Property="Background" Value="#181818"/>
@@ -136,8 +137,7 @@
             </DataGrid.CellStyle>
 
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Sound File" Binding="{Binding SoundFile}" Width="*"
-                                    CanUserSort="True">
+                <DataGridTextColumn Header="Sound File" Binding="{Binding FileName}" Width="250" CanUserSort="True">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="Padding" Value="2"/>
@@ -145,14 +145,22 @@
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
                 
-                <DataGridTextColumn Header="Hotkey" Binding="{Binding Hotkey}" Width="200"
-                                    CanUserSort="True">
+                <DataGridTextColumn Header="Hotkey" Binding="{Binding Hotkey}" Width="*" CanUserSort="True">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="Padding" Value="2"/>
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
+
+                <DataGridTextColumn Header="MIDI Hotkey" Binding="{Binding MIDIHotkey}" Width="*" CanUserSort="True">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Padding" Value="2"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
             </DataGrid.Columns>
         </DataGrid>
     </Grid>
